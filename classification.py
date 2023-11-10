@@ -101,18 +101,6 @@ class classification():
        
 # Load the data 
      def get_data(self,filename):
-    # Load the file using CSV Reader          
-        # fl=open(self.path+'winequality_white.csv',"r")  
-        # reader = list(csv.reader(fl,delimiter='\n')) 
-        # fl.close()
-        # data=[]; labels=[];
-        # for item in reader[1:]:
-        #     item=''.join(item).split(';')
-        #     labels.append(item[-1]) 
-        #     data.append(item[:-1])
-        # # labels=[int(''.join(item)) for item in labels]
-        # data=np.asarray(data)
- 
     # Load the file using Pandas       
         reader=pd.read_csv(filename)  
         
