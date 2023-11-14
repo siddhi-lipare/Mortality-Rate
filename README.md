@@ -21,4 +21,4 @@ python main_classification.py
 ----------
 *Results and Findings:*
 ----------
-- I achieved a maximum F1-Score of 0.95 and an accuracy of 95% upon training the model on the Random Forest Classifier and imputing missing vallues using the knn imputation. 
+- I achieved a maximum F1-Score of 0.95 and an accuracy of 95% upon training the model on the Random Forest Classifier and AdaBoost Classifier imputing the missing values using knn imputation method. 
