@@ -6,6 +6,7 @@ from sklearn.impute import SimpleImputer, KNNImputer
 from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn import svm
 from sklearn.neural_network import MLPClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
@@ -30,11 +31,61 @@ class Classification:
 
     def classification_pipeline(self):
         if self.clf_opt == 'rf':
+            print('\n\t### Training Random Forest Classifier ### \n')
             clf = RandomForestClassifier(random_state=42)
+            param_grid = {
+                'clf__n_estimators': [80, 90, 100],
+                'clf__max_depth': [None, 10, 20],
+                'clf__min_samples_split': [2, 4, 6, 8],
+                'clf__min_samples_leaf': [2, 3, 4]
+            }
         elif self.clf_opt == 'dt':
+            print('\n\t### Training Decision Tree Classifier ### \n')
             clf = DecisionTreeClassifier(random_state=42)
+            param_grid = {
+                'clf__criterion': ['gini', 'entropy'],
+                'clf__max_features': ['auto', 'sqrt', 'log2'],
+                'clf__max_depth': [10, 40, 45, 60],
+                'clf__ccp_alpha': [0.009, 0.01, 0.05, 0.1],
+            }
         elif self.clf_opt == 'ab':
-            clf = AdaBoostClassifier(base_estimator=RandomForestClassifier(random_state=42), random_state=42)
+            print('\n\t### Training AdaBoost Classifier ### \n')
+            be1 = RandomForestClassifier(max_depth=50, n_estimators=100)
+            be2 = LogisticRegression(solver='liblinear', class_weight='balanced')
+            be3 = DecisionTreeClassifier(max_depth=50)
+            clf = AdaBoostClassifier(algorithm='SAMME.R', n_estimators=100)
+            param_grid = {
+                'clf__base_estimator': [be1, be2, be3],
+                'clf__n_estimators': [50, 100, 150],
+                'clf__learning_rate': [0.01, 0.1, 1],
+                'clf__random_state': [0, 10]
+            }
+        elif self.clf_opt == 'mlp':
+            print('\n\t### Training MLP Classifier ### \n')
+            clf = MLPClassifier(random_state=42)
+            param_grid = {
+                'clf__hidden_layer_sizes': [(50, 50, 50), (50, 100, 50), (100,)],
+                'clf__activation': ['tanh', 'relu'],
+                'clf__solver': ['sgd', 'adam'],
+                'clf__alpha': [0.0001, 0.05],
+                'clf__learning_rate': ['constant', 'adaptive'],
+            }
+        elif self.clf_opt == 'svm':
+            print('\n\t### Training SVM Classifier ### \n')
+            clf = SVC(random_state=42)
+            param_grid = {
+                'clf__C': [0.1, 1, 10, 100],
+                'clf__gamma': [1, 0.1, 0.01, 0.001],
+                'clf__kernel': ['rbf', 'poly', 'sigmoid']
+            }
+        elif self.clf_opt == 'knn':
+            print('\n\t### Training KNN Classifier ### \n')
+            clf = KNeighborsClassifier()
+            param_grid = {
+                'clf__n_neighbors': [5, 10, 15, 20],
+                'clf__weights': ['uniform', 'distance'],
+                'clf__metric': ['euclidean', 'manhattan']
+            }
         else:
             print('Invalid classifier option')
             return None, None
@@ -49,7 +100,8 @@ class Classification:
             print('Invalid imputation option')
             return None, None
 
-        return clf, imputer
+        return clf, imputer, param_grid
+
 
     def oversample_smote(self, X, y):
         smote = SMOTE(random_state=42)
@@ -96,16 +148,32 @@ class Classification:
         )
 
         # Classification
-        clf, imputer = self.classification_pipeline()
+        clf, imputer, param_grid = self.classification_pipeline()
         if clf is None or imputer is None:
             return
 
-        clf.fit(X_train, y_train.values.ravel())
-        y_pred = clf.predict(X_test)
+        pipeline = Pipeline([
+            ('imputer', imputer),
+            ('clf', clf)
+        ])
+
+        scorer = make_scorer(f1_score, average='weighted')
+        grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring=scorer, cv=5)
+
+        grid_search.fit(X_train, y_train.values.ravel())
+
+        # Print the best hyperparameters
+        print("Best Hyperparameters:", grid_search.best_params_)
+
+        # Get the best model
+        best_model = grid_search.best_estimator_
+
+        # Make predictions on the test set using the best model
+        y_pred = best_model.predict(X_test)
+
+        # Evaluate the best model
+        f1_score_final = f1_score(y_test, y_pred)
         accuracy = accuracy_score(y_test, y_pred)
-        f1_sc = f1_score(y_test, y_pred)
-
-        print(f'F1-Score with {self.impute_opt} imputation and {self.clf_opt} classifier: {f1_sc:.2f}')
-        print(f'Accuracy with {self.impute_opt} imputation and {self.clf_opt} classifier: {accuracy:.2f}')
-
+        print(f'F1-Score of the Best Model: {f1_score_final:.2f}')
+        print(f'Accuracy of the Best Model: {accuracy:.2f}')
 
