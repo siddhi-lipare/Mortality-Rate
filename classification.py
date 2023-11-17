@@ -10,7 +10,8 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, accuracy_score, f1_score, make_scorer, precision_score, recall_score, confusion_matrix
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.feature_selection import SelectKBest, f_classif
 from sklearn.pipeline import Pipeline
 from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE
@@ -30,9 +31,8 @@ class Classification:
                 'clf__max_depth': [None, 10, 20],
                 'clf__min_samples_split': [2, 4, 6],
                 'clf__min_samples_leaf': [2, 3, 4],
-                # 'clf__bootstrap': [True, False],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
                 'clf__criterion': ['gini', 'entropy'],
-                # 'clf__class_weight': ['balanced', 'balanced_subsample', None]
             }
         elif self.clf_opt == 'dt':
             print('\n\t### Training Decision Tree Classifier ### \n')
@@ -43,6 +43,18 @@ class Classification:
                 'clf__max_depth': [1, 5, 10, 20],
                 'clf__ccp_alpha': [0.009, 0.01, 0.05, 0.1],
                 'clf__min_samples_split': [2, 4, 6],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
+            }
+        elif self.clf_opt == 'lr':
+            print('\n\t### Training Logistic Regression Classifier ### \n')
+            clf = LogisticRegression(solver='liblinear', random_state=42)
+            param_grid = {
+                'clf__penalty': ['l1', 'l2'],
+                'clf__C': [0.1, 0.01, 0.5],
+                'clf__class_weight': ['balanced', None],
+                'clf__max_iter': [70, 80, 100],
+                'clf__tol': [0.0001, 0.001, 0.01],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
             }
         elif self.clf_opt == 'ab':
             print('\n\t### Training AdaBoost Classifier ### \n')
@@ -54,6 +66,7 @@ class Classification:
                 'clf__base_estimator': [be1, be2, be3],
                 'clf__learning_rate': [0.01, 0.1, 1],
                 'clf__random_state': [10, 42],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
             }
         elif self.clf_opt == 'svm':
             print('\n\t### Training SVM Classifier ### \n')
@@ -61,7 +74,8 @@ class Classification:
             param_grid = {
                 'clf__C': [0.1, 1, 10, 100],
                 'clf__gamma': [1, 0.1, 0.01, 0.001],
-                'clf__kernel': ['rbf', 'poly', 'sigmoid']
+                'clf__kernel': ['rbf', 'poly', 'sigmoid'],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
             }
         elif self.clf_opt == 'knn':
             print('\n\t### Training KNN Classifier ### \n')
@@ -69,7 +83,8 @@ class Classification:
             param_grid = {
                 'clf__n_neighbors': [5, 10, 15, 20],
                 'clf__weights': ['uniform', 'distance'],
-                'clf__metric': ['euclidean', 'manhattan']
+                'clf__metric': ['euclidean', 'manhattan'],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
             }
         elif self.clf_opt == 'xg':
             print('\n\t### Training XGBoost Classifier ### \n')
@@ -80,7 +95,8 @@ class Classification:
                 'clf__learning_rate': [0.01, 0.1, 0.2],
                 'clf__subsample': [0.8, 0.9, 1.0],
                 'clf__colsample_bytree': [0.8, 0.9, 1.0],
-                'clf__scale_pos_weight': [6.34]
+                'clf__scale_pos_weight': [6.34],
+                'feature_selection__k': [30, 48],  # Add k to the parameter grid
             }
         else:
             print('Invalid classifier option')
@@ -98,7 +114,7 @@ class Classification:
         elif self.impute_opt == 'mode':
             return SimpleImputer(strategy='most_frequent')
         elif self.impute_opt == 'knn':
-            return KNNImputer(n_neighbors=5)
+            return KNNImputer(n_neighbors=4, weights='uniform', metric='nan_euclidean')
         else:
             print('Invalid imputation option')
             return None
@@ -117,7 +133,7 @@ class Classification:
         imputer = self.get_imputer()
         if imputer is None:
             return
-
+        
         X_imputed = pd.DataFrame(data=imputer.fit_transform(X), columns=X.columns)
 
         # Standard Scaling
@@ -132,7 +148,7 @@ class Classification:
         if clf is None:
             return
 
-        pipeline_steps = [('imputer', imputer), ('scaler', scaler), ('clf', clf)]
+        pipeline_steps = [('imputer', imputer), ('scaler', scaler), ('feature_selection', SelectKBest(score_func=f_classif)), ('clf', clf)]
         pipeline = Pipeline(pipeline_steps)
 
         scorer = make_scorer(f1_score, average='weighted')
@@ -159,14 +175,8 @@ class Classification:
         precision_final = precision_score(y_test, y_pred)
         recall = recall_score(y_test, y_pred)
         conf_mat = confusion_matrix(y_test, y_pred)
-        print(f'F1-Score of the Best Model: {f1_score_final:.2f}')
-        print(f'Precision of the Best Model: {precision_final:.2f}')
-        print(f'Accuracy of the Best Model: {accuracy:.2f}')
-        print(f'Recall of the Best Model: {recall:.2f}')
-        print(f'Confusion Matrix of the Best Model: {conf_mat}')
-
-        # Make predictions on the test data using the best model
-        # (uncomment the following lines if you want to save predictions on the entire test set)
-        # y_test_pred = best_model.predict(X_test_scaled)
-        # df_predictions = pd.DataFrame(y_test_pred)
-        # df_predictions.to_csv('predicted_labels_final.csv', index=False)
+        print(f'F1-Score: {f1_score_final:.2f}')
+        print(f'Precision: {precision_final:.2f}')
+        print(f'Accuracy: {accuracy:.2f}')
+        print(f'Recall: {recall:.2f}')
+        print(f'Confusion Matrix:\n {conf_mat}')
