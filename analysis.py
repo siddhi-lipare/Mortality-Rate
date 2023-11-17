@@ -7,12 +7,15 @@ import seaborn as sns
 X = pd.read_csv("data/training_data.csv")
 Y = pd.read_csv("data/training_data_targets.csv", header=None)
 
+print("\nShape of training data: ", X.shape)
+print("\nShape of training target data: ", Y.shape)
+
 # Check for missing values
 missing_values = X.isnull().sum()
 
 missing_values_count = missing_values[missing_values > 0]
 total_missing_values = missing_values_count.sum()
-
+print("\n\n Number of missing values for each column:")
 print(missing_values_count)
 print("\nTotal Missing Values: ", total_missing_values)
 
@@ -47,12 +50,12 @@ high_correlation = correlation_matrix[(correlation_matrix > 0.6) & (correlation_
 # Get the indices of pairs with correlation > 0.6
 high_corr_indices = [(i, j) for i in range(correlation_matrix.shape[0]) for j in range(i+1, correlation_matrix.shape[1]) if high_correlation.iloc[i, j] > 0.6]
 
-print("Pairs with correlation > 0.6:")
+print("\n\nPairs with correlation > 0.6:")
 for i, j in high_corr_indices:
     print(f"{X.columns[i]} - {X.columns[j]}: {high_correlation.iloc[i, j]}")
 
 class_counts = Y.value_counts()
-print("Number of samples in each class:")
+print("\n\nNumber of samples in each class:")
 print(class_counts)
 
 

@@ -122,7 +122,6 @@ class Classification:
         # Load data
         X = pd.read_csv("data/training_data.csv")
         Y = pd.read_csv("data/training_data_targets.csv", header=None)
-        # X_testdata = pd.read_csv("data/test_data.csv")
 
         # Imputation
         imputer = self.get_imputer()
@@ -134,7 +133,6 @@ class Classification:
         # Standard Scaling
         scaler = StandardScaler()
         X_scaled = pd.DataFrame(data=scaler.fit_transform(X_imputed), columns=X_imputed.columns)
-        # X_test_scaled = pd.DataFrame(data=scaler.fit_transform(X_testdata), columns=X_testdata.columns)
 
         # Oversample
         X_resampled, y_resampled = self.oversample_smote(X_scaled, Y)
@@ -145,48 +143,40 @@ class Classification:
             return
 
         pipeline_steps = [('imputer', imputer), ('scaler', scaler), ('clf', clf)]
-
         pipeline = Pipeline(pipeline_steps)
 
         scorer = make_scorer(f1_score, average='weighted')
-        
-        # Use StratifiedKFold with k=5
-        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-        for fold, (train_index, test_index) in enumerate(skf.split(X_resampled, y_resampled)):
-            X_train, X_test = X_resampled.iloc[train_index], X_resampled.iloc[test_index]
-            y_train, y_test = y_resampled.iloc[train_index], y_resampled.iloc[test_index]
+        # Use train_test_split with stratify
+        X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42, stratify=y_resampled)
 
-            # Fit the pipeline using GridSearchCV
-            grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring=scorer, cv=5)
-            grid_search.fit(X_train, y_train.values.ravel())
+        # Fit the pipeline using GridSearchCV
+        grid_search = GridSearchCV(estimator=pipeline, param_grid=param_grid, scoring=scorer, cv=5)
+        grid_search.fit(X_train, y_train.values.ravel())
 
-            # Print the best hyperparameters for each fold
-            print(f"\nBest Hyperparameters - Fold {fold + 1}: {grid_search.best_params_}")
+        # Print the best hyperparameters
+        print(f"\nBest Hyperparameters: {grid_search.best_params_}")
 
-            # Get the best model
-            best_model = grid_search.best_estimator_
+        # Get the best model
+        best_model = grid_search.best_estimator_
 
-            # Make predictions on the test set using the best model
-            y_pred = best_model.predict(X_test)
+        # Make predictions on the test set using the best model
+        y_pred = best_model.predict(X_test)
 
-            # Evaluate the best model for each fold
-            f1_score_final = f1_score(y_test, y_pred)
-            accuracy = accuracy_score(y_test, y_pred)
-            precision_final = precision_score(y_test, y_pred)
-            recall = recall_score(y_test, y_pred)
-            conf_mat = confusion_matrix(y_test, y_pred)
-            print(f'F1-Score of the Best Model - Fold {fold + 1}: {f1_score_final:.2f}')
-            print(f'Precison of the model - Fold {fold + 1}: {precision_final:.2f}')
-            print(f'Accuracy of the Best Model - Fold {fold + 1}: {accuracy:.2f}')
-            print(f'Recall of the Best Model - Fold {fold + 1}: {recall:.2f}')
-            print(f'Confusion Matrix of the Best Model - Fold {fold + 1}: {conf_mat}')
+        # Evaluate the best model
+        f1_score_final = f1_score(y_test, y_pred)
+        accuracy = accuracy_score(y_test, y_pred)
+        precision_final = precision_score(y_test, y_pred)
+        recall = recall_score(y_test, y_pred)
+        conf_mat = confusion_matrix(y_test, y_pred)
+        print(f'F1-Score of the Best Model: {f1_score_final:.2f}')
+        print(f'Precision of the Best Model: {precision_final:.2f}')
+        print(f'Accuracy of the Best Model: {accuracy:.2f}')
+        print(f'Recall of the Best Model: {recall:.2f}')
+        print(f'Confusion Matrix of the Best Model: {conf_mat}')
 
-            # # Make predictions on the test data using the best model
-            # y_test_pred = best_model.predict(X_test_scaled)
-
-            # # Create a DataFrame with the predicted labels for each fold
-            # df_predictions = pd.DataFrame(y_test_pred)
-
-            # # Save the DataFrame to a CSV file for each fold
-            # df_predictions.to_csv(f'predicted_labels_fold_{fold + 1}.csv', index=False)
+        # Make predictions on the test data using the best model
+        # (uncomment the following lines if you want to save predictions on the entire test set)
+        # y_test_pred = best_model.predict(X_test_scaled)
+        # df_predictions = pd.DataFrame(y_test_pred)
+        # df_predictions.to_csv('predicted_labels_final.csv', index=False)
