@@ -27,8 +27,8 @@ plt.show()
 # Plot histograms for each numeric column for checking outliers
 numeric_columns = X.select_dtypes(include=np.number).columns
 
-plt.figure(figsize=(16, 8))
-X[numeric_columns].hist(bins=30, figsize=(16, 8), layout=(2, len(numeric_columns) // 2 + 1))
+# plt.figure(figsize=(20,16))
+X[numeric_columns].hist(bins=30, figsize=(24,12), layout=(2, len(numeric_columns) // 2 + 1))
 plt.suptitle('Histograms for Numeric Columns', y=1.02)
 plt.show()
 
@@ -36,7 +36,7 @@ plt.show()
 correlation_matrix = X.corr()
 
 # Plot heatmap
-plt.figure(figsize=(4,4))
+plt.figure(figsize=(10,10))
 sns.heatmap(correlation_matrix, annot=False, cmap="coolwarm", fmt=".2f", linewidths=0.7)
 plt.title("Correlation Matrix")
 plt.show()
