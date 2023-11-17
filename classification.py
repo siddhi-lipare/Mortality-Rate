@@ -29,7 +29,6 @@ class Classification:
                 'clf__n_estimators': [50, 70, 80],
                 'clf__max_depth': [None, 10, 20],
                 'clf__min_samples_split': [2, 4, 6],
-                'clf__min_samples_leaf': [2, 3, 4],
                 'feature_selection__k': [30, 48],  # Add k to the parameter grid
                 'clf__criterion': ['gini', 'entropy'],
             }
@@ -127,6 +126,7 @@ class Classification:
         # Load data
         X = pd.read_csv("data/training_data.csv")
         Y = pd.read_csv("data/training_data_targets.csv", header=None)
+        X_testdata = pd.read_csv("data/test_data.csv")
 
         # Imputation
         imputer = self.get_imputer()
@@ -138,6 +138,7 @@ class Classification:
         # Standard Scaling
         scaler = StandardScaler()
         X_scaled = pd.DataFrame(data=scaler.fit_transform(X_imputed), columns=X_imputed.columns)
+        X_testdata_scaled = pd.DataFrame(data=scaler.fit_transform(X_testdata), columns=X_testdata.columns)
 
         # Oversample
         X_resampled, y_resampled = self.oversample_smote(X_scaled, Y)
@@ -179,3 +180,8 @@ class Classification:
         print(f'Accuracy: {accuracy:.2f}')
         print(f'Recall: {recall:.2f}')
         print(f'Confusion Matrix:\n {conf_mat}')
+
+        # Make predictions on the test data
+        y_pred_testdata = best_model.predict(X_testdata_scaled)
+        y_pred_testdata = pd.DataFrame(y_pred_testdata)
+        y_pred_testdata.to_csv('data/test_data_predictions.csv', index=False)

@@ -50,4 +50,8 @@ class_counts = Y.value_counts()
 print("\n\nNumber of samples in each class:")
 print(class_counts)
 
+class_counts_test = pd.read_csv("data/test_data_predictions.csv", header=None).value_counts()
+print("\n\nNumber of samples in each class in test data:")
+print(class_counts_test)
+
 
