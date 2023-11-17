@@ -3,5 +3,5 @@ from classification import Classification
 import warnings
 warnings.filterwarnings("ignore")
 
-classifier = Classification(clf_opt='rf', impute_opt='knn', no_of_selected_features=48)
+classifier = Classification(clf_opt='ab', impute_opt='knn', no_of_selected_features=48)
 classifier.classification()

@@ -40,8 +40,9 @@ class Classification:
             param_grid = {
                 'clf__criterion': ['gini', 'entropy'],
                 'clf__max_features': ['auto', 'sqrt', 'log2'],
-                'clf__max_depth': [10, 40, 45, 60],
+                'clf__max_depth': [1, 5, 10, 20],
                 'clf__ccp_alpha': [0.009, 0.01, 0.05, 0.1],
+                'clf__min_samples_split': [2, 4, 6],
             }
         elif self.clf_opt == 'ab':
             print('\n\t### Training AdaBoost Classifier ### \n')
@@ -51,19 +52,8 @@ class Classification:
             clf = AdaBoostClassifier(algorithm='SAMME.R', n_estimators=100)
             param_grid = {
                 'clf__base_estimator': [be1, be2, be3],
-                'clf__n_estimators': [50, 100, 150],
                 'clf__learning_rate': [0.01, 0.1, 1],
-                'clf__random_state': [0, 10]
-            }
-        elif self.clf_opt == 'mlp':
-            print('\n\t### Training MLP Classifier ### \n')
-            clf = MLPClassifier(random_state=42)
-            param_grid = {
-                'clf__hidden_layer_sizes': [(50, 50, 50), (50, 100, 50), (100,50,50)],
-                'clf__activation': ['tanh', 'relu'],
-                'clf__solver': ['sgd', 'adam'],
-                'clf__alpha': [0.0001, 0.05],
-                # 'clf__learning_rate': ['constant', 'adaptive']
+                'clf__random_state': [10, 42],
             }
         elif self.clf_opt == 'svm':
             print('\n\t### Training SVM Classifier ### \n')
