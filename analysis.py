@@ -16,7 +16,6 @@ total_missing_values = missing_values_count.sum()
 print(missing_values_count)
 print("\nTotal Missing Values: ", total_missing_values)
 
-
 # Plot a bar chart for missing values
 plt.figure(figsize=(12, 6))
 missing_values.plot(kind='bar')
@@ -32,8 +31,6 @@ plt.figure(figsize=(16, 8))
 X[numeric_columns].hist(bins=30, figsize=(16, 8), layout=(2, len(numeric_columns) // 2 + 1))
 plt.suptitle('Histograms for Numeric Columns', y=1.02)
 plt.show()
-
-
 
 # Calculate correlation matrix
 correlation_matrix = X.corr()
