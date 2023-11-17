@@ -3,5 +3,5 @@ from classification import Classification
 import warnings
 warnings.filterwarnings("ignore")
 
-classifier = Classification(clf_opt='knn', impute_opt='knn', no_of_selected_features=48)
+classifier = Classification(clf_opt='svm', impute_opt='knn', no_of_selected_features=48)
 classifier.classification()
