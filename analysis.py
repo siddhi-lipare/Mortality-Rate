@@ -27,14 +27,6 @@ plt.xlabel('Columns')
 plt.ylabel('Number of Missing Values')
 plt.show()
 
-# Plot histograms for each numeric column for checking outliers
-numeric_columns = X.select_dtypes(include=np.number).columns
-
-# plt.figure(figsize=(20,16))
-X[numeric_columns].hist(bins=30, figsize=(24,12), layout=(2, len(numeric_columns) // 2 + 1))
-plt.suptitle('Histograms for Numeric Columns', y=1.02)
-plt.show()
-
 # Calculate correlation matrix
 correlation_matrix = X.corr()
 
