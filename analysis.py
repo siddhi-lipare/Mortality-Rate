@@ -63,5 +63,12 @@ class_counts_test = pd.read_csv("data/test_data_predictions.csv", header=None).v
 print("\n\nNumber of samples in each class in test data:")
 print(class_counts_test)
 
+# Plot a bar chart for class counts
+plt.figure(figsize=(12, 6))
+class_counts_test.plot(kind='bar')
+plt.title('Number of Samples in Each Class in Test Data')
+plt.xlabel('Class')
+plt.ylabel('Number of Samples')
+plt.show()
 
 
