@@ -1,4 +1,4 @@
-from classification2 import Classification
+from classification import Classification
 
 import warnings
 warnings.filterwarnings("ignore")
