@@ -1,7 +1,7 @@
-from classification import Classification
+from classification2 import Classification
 
 import warnings
 warnings.filterwarnings("ignore")
 
-classifier = Classification(clf_opt='rf', impute_opt='knn', no_of_selected_features=48)
+classifier = Classification(clf_opt='lr', impute_opt='knn')
 classifier.classification()
