@@ -16,9 +16,9 @@ Prediction of Mortality Rate of Heart Failure Patients Admitted to ICU
 ----------
 - Run the Following command:
 ```bash
-python main_classification.py
+python Siddhi_Pravin_Lipare_main_classification.py
 ```
 ----------
 *Results and Findings:*
 ----------
-- I achieved a maximum F1-Score of 0.95 and an accuracy of 95% upon training the model on the Random Forest Classifier and AdaBoost Classifier imputing the missing values using knn imputation method. 
+- I achieved a maximum F1-Score of 0.68 upon training the model on the AdaBoost Classifier imputing the missing values using knn imputation method. 
