@@ -65,7 +65,7 @@ class Classification:
                 'clf__max_iter': [70, 80, 100], # Maximum number of iterations 
                 'clf__solver': ['liblinear', 'saga'], # Algorithm to use in the optimization problem
                 'clf__tol': [0.0001, 0.001, 0.01], # Tolerance for stopping criteria
-                'feature_selection__k': [30, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                # 'feature_selection__k': [30, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
         elif self.clf_opt == 'ab':
             print('\n\t### Training AdaBoost Classifier ### \n')
@@ -77,7 +77,8 @@ class Classification:
                 'clf__base_estimator': [be1, be2, be3],
                 'clf__n_estimators': [50, 120, 130],
                 'clf__learning_rate': [0.01, 0.1, 1],
-                'clf__random_state': [0, 10]
+                'clf__random_state': [0, 10],
+                # 'feature_selection__k': [30, 45, 47],
             }
         elif self.clf_opt == 'svm':
             print('\n\t### Training SVM Classifier ### \n')
