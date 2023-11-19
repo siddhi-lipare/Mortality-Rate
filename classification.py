@@ -30,7 +30,7 @@ class Classification:
                 'clf__max_depth': [None, 10, 20, 50], # Maximum depth of the tree
                 'clf__min_samples_split': [2, 4, 6, 8], # Minimum number of samples required to split an internal node
                 'clf__criterion': ['gini', 'entropy', 'mse'], # Function to measure the quality of a split
-                # 'feature_selection__k': [30, 45, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                'feature_selection__k': [30, 45, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
         elif self.clf_opt == 'lsvc':
             print('\n\t### Training Linear SVC Classifier ### \n')
@@ -41,7 +41,7 @@ class Classification:
                 'clf__loss': ['hinge', 'squared_hinge'], # Loss function
                 'clf__max_iter': [70, 80, 100], # Maximum number of iterations
                 'clf__tol': [0.0001, 0.001, 0.01], # Tolerance for stopping criteria
-                # 'feature_selection__k': [30, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                'feature_selection__k': [30, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
 
         elif self.clf_opt == 'dt':
@@ -53,7 +53,7 @@ class Classification:
                 'clf__max_depth': [1, 5, 10, 20], # Maximum depth of the tree
                 'clf__ccp_alpha': [0.009, 0.01, 0.05, 0.1], # Complexity parameter used for Minimal Cost-Complexity Pruning
                 'clf__min_samples_split': [2, 4, 6], # Minimum number of samples required to split an internal node
-                # 'feature_selection__k': [30, 45, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                'feature_selection__k': [30, 45, 47],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
         elif self.clf_opt == 'lr':
             print('\n\t### Training Logistic Regression Classifier ### \n')
@@ -87,7 +87,7 @@ class Classification:
                 'clf__kernel': ['poly', 'rbf', 'sigmoid'], # Kernel type
                 'clf__degree': [1, 2, 3, 4], # Degree of the polynomial kernel function
                 'clf__gamma': ['scale', 'auto'], # Kernel coefficient
-                # 'feature_selection__k': [30, 45],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                'feature_selection__k': [30, 45],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
         elif self.clf_opt == 'knn':
             print('\n\t### Training KNN Classifier ### \n')
@@ -96,7 +96,7 @@ class Classification:
                 'clf__n_neighbors': [5, 10, 15, 20], # Number of neighbors
                 'clf__weights': ['uniform', 'distance'], # Weight function used in prediction
                 'clf__metric': ['euclidean', 'manhattan'], # Distance metric
-                # 'feature_selection__k': [30, 45],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                'feature_selection__k': [30, 45],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
         elif self.clf_opt == 'xg':
             print('\n\t### Training XGBoost Classifier ### \n')
@@ -108,7 +108,7 @@ class Classification:
                 'clf__subsample': [0.8, 0.9, 1.0], # Subsample ratio of the training instances
                 'clf__colsample_bytree': [0.8, 0.9, 1.0], # Subsample ratio of columns when constructing each tree
                 'clf__scale_pos_weight': [6.34], # Control the balance of positive and negative weights. 6.34 was chosen since a typical value to consider: sum(negative instances) / sum(positive instances)
-                # 'feature_selection__k': [30, 40],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
+                'feature_selection__k': [30, 40],  # Add k to the parameter grid. Uncomment this line if using feature selection using SelectKBest
             }
         else:
             print('Invalid classifier option')
@@ -214,7 +214,7 @@ class Classification:
 
         # Tried various Feature Selection methods but chose SelectKBest with Mutual Information as it gave the best results
 
-        # Add feature selection to the pipeline - SelectKBest
+        # Add feature selection to the pipeline - SelectKBest with ANOVA F-value
         feature_selection = SelectKBest(score_func=f_classif, k=self.no_of_selected_features)
         pipeline_steps = [('imputer', imputer), ('feature_selection', feature_selection), ('clf', clf)]
         pipeline = Pipeline(pipeline_steps)
